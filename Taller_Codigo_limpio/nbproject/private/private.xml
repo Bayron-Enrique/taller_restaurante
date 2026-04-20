@@ -3,8 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Bayron/OneDrive/Documents/NetBeansProjects/taller_restaurante/Taller_Codigo_limpio/src/Datos.java</file>
-            <file>file:/C:/Users/Bayron/OneDrive/Documents/NetBeansProjects/taller_restaurante/Taller_Codigo_limpio/src/Imprimir.java</file>
+            <file>file:/C:/Users/Bayron/OneDrive/Documents/NetBeansProjects/taller_restaurante/Taller_Codigo_limpio/src/com/mycompany/restauranteelbuensabor/Datos.java</file>
+            <file>file:/C:/Users/Bayron/OneDrive/Documents/NetBeansProjects/taller_restaurante/Taller_Codigo_limpio/src/com/mycompany/restauranteelbuensabor/Imprimir.java</file>
+            <file>file:/C:/Users/Bayron/OneDrive/Documents/NetBeansProjects/taller_restaurante/Taller_Codigo_limpio/src/com/mycompany/restauranteelbuensabor/Proceso.java</file>
+            <file>file:/C:/Users/Bayron/OneDrive/Documents/NetBeansProjects/taller_restaurante/Taller_Codigo_limpio/src/com/mycompany/restauranteelbuensabor/RestauranteElBuenSabor.java</file>
+            <file>file:/C:/Users/Bayron/OneDrive/Documents/NetBeansProjects/taller_restaurante/Taller_Codigo_limpio/src/com/mycompany/restauranteelbuensabor/Utilidades.java</file>
         </group>
     </open-files>
 </project-private>

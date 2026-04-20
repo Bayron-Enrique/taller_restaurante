@@ -133,5 +133,5 @@ public class RestauranteElBuenSabor {
     private static void nuevaMesa() {
         Utilidades.reiniciar();
         System.out.println("Mesa reiniciada.");
-    }
+    }1
 }
