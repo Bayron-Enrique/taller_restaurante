@@ -4,6 +4,8 @@ import java.util.Scanner;
 
 public class RestauranteElBuenSabor {
 
+    private static Pedido pedidoActual = null;
+
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
@@ -51,7 +53,7 @@ public class RestauranteElBuenSabor {
 
     private static void mostrarMenu() {
         System.out.println("========================================");
-        System.out.println("    " + Datos.getNombreRestaurante());
+        System.out.println("    " + Restaurante.getNombre());
         System.out.println("========================================");
         System.out.println("1. Ver carta");
         System.out.println("2. Agregar producto");
@@ -74,13 +76,13 @@ public class RestauranteElBuenSabor {
 
     private static void agregarProducto(Scanner scanner) {
 
-        System.out.print("Producto (1-" + Datos.getCantidadProductos() + "): ");
+        System.out.print("Producto (1-" + Carta.getCantidadProductos() + "): ");
         int indice = leerEntero(scanner) - 1;
 
         System.out.print("Cantidad: ");
         int cantidad = leerEntero(scanner);
 
-        if (indice < 0 || indice >= Datos.getCantidadProductos()) {
+        if (indice < 0 || indice >= Carta.getCantidadProductos()) {
             System.out.println("Producto inválido.");
             return;
         }
@@ -90,48 +92,48 @@ public class RestauranteElBuenSabor {
             return;
         }
 
-        if (!Datos.isMesaActiva()) {
-            activarMesa(scanner);
+        if (pedidoActual == null) {
+            pedidoActual = crearNuevoPedido(scanner);
         }
 
-        Datos.agregarCantidadProducto(indice, cantidad);
+        Producto producto = Carta.getProducto(indice);
+        pedidoActual.agregarItem(producto, cantidad);
 
-        System.out.println("Agregado: "
-                + Datos.getNombreProducto(indice)
-                + " x" + cantidad);
+        System.out.println("Agregado: " + producto.getNombre() + " x" + cantidad);
     }
 
-    private static void activarMesa(Scanner scanner) {
+    private static Pedido crearNuevoPedido(Scanner scanner) {
         System.out.print("Número de mesa: ");
-        int mesa = leerEntero(scanner);
+        int numeroMesa = leerEntero(scanner);
 
-        if (mesa <= 0) {
-            mesa = 1;
+        if (numeroMesa <= 0) {
+            numeroMesa = 1;
         }
 
-        Datos.setNumeroMesaActual(mesa);
-        Datos.setMesaActiva(true);
+        return new Pedido(numeroMesa);
     }
 
     private static void mostrarPedido() {
-        if (Utilidades.validar()) {
-            Imprimir.mostrarPedido();
+        if (pedidoActual != null && pedidoActual.tieneProductos()) {
+            Imprimir.mostrarPedido(pedidoActual);
         } else {
-            System.out.println("No hay productos.");
+            System.out.println("No hay productos en el pedido.");
         }
     }
 
     private static void generarFactura() {
-        if (Utilidades.validar()) {
-            Proceso.calcularTotalFactura();
-            Imprimir.imprimirFacturaCompleta();
-        } else {
+        if (pedidoActual == null || !pedidoActual.tieneProductos()) {
             System.out.println("No hay productos para facturar.");
+            return;
         }
+
+        Factura factura = new Factura(pedidoActual);
+        Imprimir.imprimirFacturaCompleta(factura);
+        pedidoActual = null;
     }
 
     private static void nuevaMesa() {
-        Utilidades.reiniciar();
+        pedidoActual = null;
         System.out.println("Mesa reiniciada.");
     }
 }

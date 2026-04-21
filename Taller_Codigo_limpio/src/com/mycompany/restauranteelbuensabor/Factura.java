@@ -8,21 +8,21 @@ public final class Factura {
     private static final double UMBRAL_PROPINA = 50000;
     private static final int MIN_ITEMS_DESCUENTO = 3;
 
+    private static int contadorFacturas = 1;
+
     private final Pedido pedido;
     private final int numero;
 
-    public Factura(Pedido pedido, int numero) {
+    public Factura(Pedido pedido) {
         if (pedido == null) {
             throw new IllegalArgumentException("El pedido no puede ser nulo.");
         }
         if (!pedido.tieneProductos()) {
             throw new IllegalStateException("No se puede generar una factura sin productos.");
         }
-        if (numero <= 0) {
-            throw new IllegalArgumentException("El número de factura debe ser mayor a cero.");
-        }
         this.pedido = pedido;
-        this.numero = numero;
+        this.numero = contadorFacturas;
+        contadorFacturas = contadorFacturas + 1;
     }
 
     public double calcularSubtotal() {

@@ -5,160 +5,85 @@ public class Imprimir {
     private static final String SEPARADOR = "========================================";
     private static final String FORMATO_ITEM = "%-20s x%-6d $%,.0f%n";
 
-    private static final double TASA_IVA = 0.19;
-    private static final double TASA_PROPINA = 0.10;
-    private static final double TASA_DESCUENTO = 0.05;
-    private static final double UMBRAL_PROPINA = 50000;
-    private static final int MIN_ITEMS_DESCUENTO = 3;
-
     public static void mostrarCarta() {
         imprimirEncabezado();
         System.out.println("    --- NUESTRA CARTA ---");
         System.out.println(SEPARADOR);
 
-        for (int i = 0; i < Datos.getCantidadProductos(); i++) {
+        for (int indice = 0; indice < Carta.getCantidadProductos(); indice++) {
+            Producto producto = Carta.getProducto(indice);
             System.out.printf("%d. %-22s $%,.0f%n",
-                    (i + 1),
-                    Datos.getNombreProducto(i),
-                    Datos.getPrecioProducto(i));
+                    (indice + 1),
+                    producto.getNombre(),
+                    producto.getPrecio());
         }
 
         System.out.println(SEPARADOR);
     }
 
-    public static void mostrarPedido() {
-        double subtotal = 0;
-
+    public static void mostrarPedido(Pedido pedido) {
         System.out.println("--- PEDIDO ACTUAL ---");
 
-        for (int i = 0; i < Datos.getCantidadProductos(); i++) {
-            int cantidad = Datos.getCantidadProducto(i);
-
-            if (cantidad > 0) {
-                double precio = Datos.getPrecioProducto(i);
-                double parcial = precio * cantidad;
-
-                System.out.printf(FORMATO_ITEM,
-                        Datos.getNombreProducto(i),
-                        cantidad,
-                        parcial);
-
-                subtotal += parcial;
-            }
+        for (ItemPedido item : pedido.getItems()) {
+            System.out.printf(FORMATO_ITEM,
+                    item.getProducto().getNombre(),
+                    item.getCantidad(),
+                    item.calcularSubtotal());
         }
 
         System.out.println("--------------------");
-        System.out.printf("%-27s $%,.0f%n", "Subtotal:", subtotal);
+        System.out.printf("%-27s $%,.0f%n", "Subtotal:", pedido.calcularSubtotal());
     }
 
-    public static void imprimirFacturaCompleta() {
-        FacturaData factura = calcularFactura();
-
+    public static void imprimirFacturaCompleta(Factura factura) {
         imprimirEncabezado();
-        System.out.printf("FACTURA No. %03d%n", Datos.getNumeroFactura());
+        System.out.printf("FACTURA No. %03d%n", factura.getNumero());
         System.out.println("----------------------------------------");
 
-        for (int i = 0; i < Datos.getCantidadProductos(); i++) {
-            int cantidad = Datos.getCantidadProducto(i);
-
-            if (cantidad > 0) {
-                double precio = Datos.getPrecioProducto(i);
-
-                System.out.printf(FORMATO_ITEM,
-                        Datos.getNombreProducto(i),
-                        cantidad,
-                        precio * cantidad);
-            }
+        for (ItemPedido item : factura.getPedido().getItems()) {
+            System.out.printf(FORMATO_ITEM,
+                    item.getProducto().getNombre(),
+                    item.getCantidad(),
+                    item.calcularSubtotal());
         }
 
         imprimirTotales(factura);
         imprimirPie();
-
-        Datos.incrementarNumeroFactura();
-        Datos.setMesaActiva(false);
-        Datos.setTotalFactura(factura.total);
     }
 
-    public static void imprimirFacturaResumen() {
-        FacturaData factura = calcularFactura();
-
+    public static void imprimirFacturaResumen(Factura factura) {
         imprimirEncabezado();
-        System.out.printf("FACTURA No. %03d (RESUMEN)%n", Datos.getNumeroFactura());
+        System.out.printf("FACTURA No. %03d (RESUMEN)%n", factura.getNumero());
         System.out.println("----------------------------------------");
-
         imprimirTotales(factura);
     }
 
     private static void imprimirEncabezado() {
         System.out.println(SEPARADOR);
-        System.out.println("    " + Datos.getNombreRestaurante());
-        System.out.println("    " + Datos.getDireccionRestaurante());
-        System.out.println("    " + Datos.getNitRestaurante());
+        System.out.println("    " + Restaurante.getNombre());
+        System.out.println("    " + Restaurante.getDireccion());
+        System.out.println("    " + Restaurante.getNit());
         System.out.println(SEPARADOR);
     }
 
     private static void imprimirPie() {
         System.out.println(SEPARADOR);
         System.out.println("Gracias por su visita!");
-        System.out.println(Datos.getNombreRestaurante() + " - Valledupar");
+        System.out.println(Restaurante.getNombre() + " - Valledupar");
         System.out.println(SEPARADOR);
     }
 
-    private static void imprimirTotales(FacturaData factura) {
+    private static void imprimirTotales(Factura factura) {
         System.out.println("----------------------------------------");
-        System.out.printf("%-27s $%,.0f%n", "Subtotal:", factura.subtotalConDescuento);
-        System.out.printf("%-27s $%,.0f%n", "IVA (19%):", factura.iva);
+        System.out.printf("%-27s $%,.0f%n", "Subtotal:", factura.calcularSubtotalConDescuento());
+        System.out.printf("%-27s $%,.0f%n", "IVA (19%):", factura.calcularIVA());
 
-        if (factura.propina > 0) {
-            System.out.printf("%-27s $%,.0f%n", "Propina (10%):", factura.propina);
+        if (factura.calcularPropina() > 0) {
+            System.out.printf("%-27s $%,.0f%n", "Propina (10%):", factura.calcularPropina());
         }
 
         System.out.println("----------------------------------------");
-        System.out.printf("%-27s $%,.0f%n", "TOTAL:", factura.total);
+        System.out.printf("%-27s $%,.0f%n", "TOTAL:", factura.calcularTotal());
         System.out.println(SEPARADOR);
-    }
-
-    private static FacturaData calcularFactura() {
-        double subtotal = 0;
-        int items = 0;
-
-        for (int i = 0; i < Datos.getCantidadProductos(); i++) {
-            int cantidad = Datos.getCantidadProducto(i);
-
-            if (cantidad > 0) {
-                subtotal += Datos.getPrecioProducto(i) * cantidad;
-                items++;
-            }
-        }
-
-        double subtotalConDescuento = (items > MIN_ITEMS_DESCUENTO)
-                ? subtotal * (1 - TASA_DESCUENTO)
-                : subtotal;
-
-        double iva = subtotalConDescuento * TASA_IVA;
-
-        double totalConIva = subtotalConDescuento + iva;
-
-        double propina = (subtotalConDescuento > UMBRAL_PROPINA)
-                ? totalConIva * TASA_PROPINA
-                : 0;
-
-        double total = totalConIva + propina;
-
-        return new FacturaData(subtotalConDescuento, iva, propina, total);
-    }
-
-    private static class FacturaData {
-        double subtotalConDescuento;
-        double iva;
-        double propina;
-        double total;
-
-        public FacturaData(double sub, double iva, double prop, double total) {
-            this.subtotalConDescuento = sub;
-            this.iva = iva;
-            this.propina = prop;
-            this.total = total;
-        }
     }
 }
