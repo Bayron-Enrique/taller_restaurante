@@ -78,7 +78,6 @@ public class Utilidades {
         Datos.setMensajeTemporal("");
     }
 
-    // 🔥 Métodos nuevos compatibles con tu versión limpia (NO rompen el taller)
 
     public static boolean hayProductosEnPedido() {
         return validar();
